@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/nav_home"
+        android:icon="@drawable/ic_wine_home_inactive"
+        android:title="홈" />
+
+    <item
+        android:id="@+id/nav_search"
+        android:icon="@drawable/ic_wine_search_inactive"
+        android:title="검색" />
+
+    <item
+        android:id="@+id/nav_ai_scan"
+        android:icon="@drawable/ic_wine_camera_inactive"
+        android:title="AI 인식" />
+
+    <item
+        android:id="@+id/nav_chatbot"
+        android:icon="@drawable/ic_wine_chat_inactive"
+        android:title="AI 챗봇" />
+
+    <item
+        android:id="@+id/nav_settings"
+        android:icon="@drawable/ic_wine_settings_inactive"
+        android:title="설정" />
+
+</menu>

@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="190dp"
+    android:layout_height="124dp"
+    android:layout_marginEnd="12dp">
+
+    <ImageView
+        android:id="@+id/ivCategoryBg"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@drawable/bg_category_large_round"
+        android:clipToOutline="true"
+        android:scaleType="centerCrop"
+        android:src="@drawable/sample_wine_red" />
+
+    <ImageView
+        android:id="@+id/ivCategoryOverlay"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:scaleType="fitXY"
+        android:src="@drawable/bg_category_overlay" />
+
+    <TextView
+        android:id="@+id/tvCategoryTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:background="@drawable/bg_category_label"
+        android:paddingStart="18dp"
+        android:paddingTop="8dp"
+        android:paddingEnd="18dp"
+        android:paddingBottom="8dp"
+        android:text="레드 와인"
+        android:textColor="@android:color/white"
+        android:textSize="16sp"
+        android:textStyle="bold" />
+</FrameLayout>

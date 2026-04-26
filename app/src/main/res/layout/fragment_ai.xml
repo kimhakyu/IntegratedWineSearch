@@ -1,0 +1,208 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#F5F5F6"
+    android:fillViewport="true">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:paddingBottom="24dp">
+
+        <!-- 상단 텍스트 영역 -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@android:color/white"
+            android:orientation="vertical"
+            android:paddingStart="24dp"
+            android:paddingTop="28dp"
+            android:paddingEnd="24dp"
+            android:paddingBottom="28dp">
+
+            <TextView
+                android:id="@+id/tvAiTitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="AI 와인 인식"
+                android:textColor="#182033"
+                android:textSize="24sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/tvAiSubTitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:text="와인 사진을 찍어 정보를 확인하세요"
+                android:textColor="#7A8394"
+                android:textSize="16sp"
+                android:textStyle="bold" />
+        </LinearLayout>
+
+        <!-- 업로드 박스 -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="18dp"
+            android:layout_marginTop="18dp"
+            android:layout_marginEnd="18dp"
+            android:background="@drawable/bg_ai_upload_box"
+            android:gravity="center_horizontal"
+            android:orientation="vertical"
+            android:paddingStart="22dp"
+            android:paddingTop="40dp"
+            android:paddingEnd="22dp"
+            android:paddingBottom="34dp">
+
+            <FrameLayout
+                android:layout_width="132dp"
+                android:layout_height="132dp"
+                android:background="@drawable/bg_ai_camera_circle"
+                android:foregroundGravity="center">
+
+                <ImageView
+                    android:id="@+id/ivAiCamera"
+                    android:layout_width="54dp"
+                    android:layout_height="54dp"
+                    android:layout_gravity="center"
+                    android:src="@drawable/ic_camera_red"
+                    app:tint="#C51F1F" />
+            </FrameLayout>
+
+            <TextView
+                android:id="@+id/tvCaptureTitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="36dp"
+                android:text="와인 사진 촬영"
+                android:textColor="#182033"
+                android:textSize="22sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/tvCaptureDescription"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="26dp"
+                android:gravity="center"
+                android:lineSpacingExtra="4dp"
+                android:text="와인 라벨이 잘 보이도록 촬영하거나\n갤러리에서 사진을 선택하세요"
+                android:textColor="#7A8394"
+                android:textSize="16sp"
+                android:textStyle="bold" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnTakePhoto"
+                android:layout_width="match_parent"
+                android:layout_height="64dp"
+                android:layout_marginStart="18dp"
+                android:layout_marginTop="44dp"
+                android:layout_marginEnd="18dp"
+                android:text="카메라로 촬영하기"
+                android:textAllCaps="false"
+                android:textColor="@android:color/white"
+                android:textSize="17sp"
+                android:textStyle="bold"
+                app:backgroundTint="#F0192D"
+                app:cornerRadius="20dp"
+                app:icon="@drawable/ic_camera_red"
+                app:iconGravity="textStart"
+                app:iconPadding="12dp"
+                app:iconTint="@android:color/white" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnPickFromGallery"
+                android:layout_width="match_parent"
+                android:layout_height="64dp"
+                android:layout_marginStart="18dp"
+                android:layout_marginTop="18dp"
+                android:layout_marginEnd="18dp"
+                android:text="갤러리에서 선택하기"
+                android:textAllCaps="false"
+                android:textColor="#C51F1F"
+                android:textSize="17sp"
+                android:textStyle="bold"
+                app:backgroundTint="@android:color/white"
+                app:cornerRadius="20dp"
+                app:icon="@drawable/ic_upload_red"
+                app:iconGravity="textStart"
+                app:iconPadding="12dp"
+                app:iconTint="#C51F1F"
+                app:strokeColor="#C51F1F"
+                app:strokeWidth="2dp" />
+        </LinearLayout>
+
+        <!-- 촬영 팁 -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="18dp"
+            android:layout_marginTop="22dp"
+            android:layout_marginEnd="18dp"
+            android:background="@drawable/bg_ai_tip_box"
+            android:orientation="vertical"
+            android:paddingStart="22dp"
+            android:paddingTop="22dp"
+            android:paddingEnd="22dp"
+            android:paddingBottom="22dp">
+
+            <TextView
+                android:id="@+id/tvTipTitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="📸 촬영 팁"
+                android:textColor="#182033"
+                android:textSize="16sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/tvTip1"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="22dp"
+                android:lineSpacingExtra="3dp"
+                android:text="• 와인 라벨이 선명하게 보이도록 촬영하세요"
+                android:textColor="#5F6878"
+                android:textSize="15sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/tvTip2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="18dp"
+                android:lineSpacingExtra="3dp"
+                android:text="• 밝은 곳에서 촬영하면 인식률이 높아집니다"
+                android:textColor="#5F6878"
+                android:textSize="15sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/tvTip3"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="18dp"
+                android:lineSpacingExtra="3dp"
+                android:text="• 라벨 전체가 화면에 나오도록 촬영하세요"
+                android:textColor="#5F6878"
+                android:textSize="15sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/tvTip4"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="18dp"
+                android:lineSpacingExtra="3dp"
+                android:text="• 반사광이나 그림자를 피해주세요"
+                android:textColor="#5F6878"
+                android:textSize="15sp"
+                android:textStyle="bold" />
+        </LinearLayout>
+
+    </LinearLayout>
+</androidx.core.widget.NestedScrollView>
