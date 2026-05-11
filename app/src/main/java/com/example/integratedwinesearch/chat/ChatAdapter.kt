@@ -64,4 +64,11 @@ class ChatAdapter(
         items.add(message)
         notifyItemInserted(items.lastIndex)
     }
+
+    fun updateMessage(messageId: String, text: String) {
+        val index = items.indexOfFirst { it.id == messageId }
+        if (index == -1) return
+        items[index] = items[index].copy(message = text)
+        notifyItemChanged(index)
+    }
 }

@@ -21,7 +21,7 @@ import java.io.IOException
 
 class AuthActivity : AppCompatActivity() {
 
-    private val baseUrl = "https://marketplace-conclusions-feet-sectors.trycloudflare.com"
+    private val baseUrl = "https://strain-republicans-receipt-laptop.trycloudflare.com"
 
     private val client = OkHttpClient()
     private val jsonMediaType = "application/json; charset=utf-8".toMediaType()

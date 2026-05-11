@@ -21,6 +21,7 @@ class ChatFragment : Fragment(R.layout.fragment_chat) {
 
     private lateinit var chatAdapter: ChatAdapter
     private val chatMessages = mutableListOf<ChatMessage>()
+    private val chatRepository = ChatRepository()
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -39,42 +40,6 @@ class ChatFragment : Fragment(R.layout.fragment_chat) {
                 id = "1",
                 message = "안녕하세요! 와인과 안주 추천을 도와드리는 AI 챗봇입니다. 어떤 와인이나 안주를 찾고 계신가요?",
                 time = "오후 2:30",
-                isUser = false
-            )
-        )
-
-        chatMessages.add(
-            ChatMessage(
-                id = "2",
-                message = "스테이크랑 잘 어울리는 와인 추천해주세요!",
-                time = "오후 2:31",
-                isUser = true
-            )
-        )
-
-        chatMessages.add(
-            ChatMessage(
-                id = "3",
-                message = "스테이크와 잘 어울리는 와인을 찾고 계신가요? 카베네 소비뇽이나 말벡을 추천드립니다. 풍부한 타닌과 깊은 맛이 육류와 완벽한 조화를 이룹니다.",
-                time = "오후 2:31",
-                isUser = false
-            )
-        )
-
-        chatMessages.add(
-            ChatMessage(
-                id = "4",
-                message = "가격대는 어느 정도가 좋을까요?",
-                time = "오후 2:32",
-                isUser = true
-            )
-        )
-
-        chatMessages.add(
-            ChatMessage(
-                id = "5",
-                message = "초보자에게는 칠레산 카베네 소비뇽이나 뉴질랜드 소비뇽 블랑을 추천합니다. 가격 대비 품질이 좋아 부담 없이 즐기기 좋습니다.",
-                time = "오후 2:32",
                 isUser = false
             )
         )
@@ -101,8 +66,37 @@ class ChatFragment : Fragment(R.layout.fragment_chat) {
             chatAdapter.addMessage(userMessage)
             chatRecyclerView.scrollToPosition(chatAdapter.itemCount - 1)
             etMessage.text.clear()
+            requestBotReply(input)
+        }
+    }
 
-            // 나중에 여기서 AI 호출 후 응답 addMessage 하면 됨
+    private fun requestBotReply(input: String) {
+        btnSend.isEnabled = false
+
+        val loadingId = "loading_${System.currentTimeMillis()}"
+        val loadingMessage = ChatMessage(
+            id = loadingId,
+            message = "답변 생성 중입니다...",
+            time = getCurrentTime(),
+            isUser = false
+        )
+        chatAdapter.addMessage(loadingMessage)
+        chatRecyclerView.scrollToPosition(chatAdapter.itemCount - 1)
+
+        chatRepository.sendMessage(input) { success, reply, error ->
+            if (!isAdded) return@sendMessage
+            requireActivity().runOnUiThread {
+                btnSend.isEnabled = true
+                if (success) {
+                    chatAdapter.updateMessage(loadingId, reply.orEmpty())
+                } else {
+                    chatAdapter.updateMessage(
+                        loadingId,
+                        error ?: "일시적인 오류가 발생했습니다. 잠시 후 다시 시도해주세요."
+                    )
+                }
+                chatRecyclerView.scrollToPosition(chatAdapter.itemCount - 1)
+            }
         }
     }
 
