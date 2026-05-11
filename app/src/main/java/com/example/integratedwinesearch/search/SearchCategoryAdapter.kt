@@ -8,11 +8,13 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
+import com.bumptech.glide.Glide
 import com.example.integratedwinesearch.R
 import com.example.integratedwinesearch.search.model.SearchCategoryItem
 
 class SearchCategoryAdapter(
-    private val items: List<SearchCategoryItem>
+    private val items: List<SearchCategoryItem>,
+    private val onCategoryClick: (SearchCategoryItem) -> Unit
 ) : RecyclerView.Adapter<SearchCategoryAdapter.SearchCategoryViewHolder>() {
 
     inner class SearchCategoryViewHolder(view: View) : RecyclerView.ViewHolder(view) {
@@ -30,12 +32,24 @@ class SearchCategoryAdapter(
     override fun onBindViewHolder(holder: SearchCategoryViewHolder, position: Int) {
         val item = items[position]
 
-        holder.ivCategoryBg.setImageResource(item.imageResId)
+        if (!item.imageUrl.isNullOrBlank()) {
+            Glide.with(holder.itemView.context)
+                .load(item.imageUrl)
+                .placeholder(item.imageResId)
+                .error(item.imageResId)
+                .into(holder.ivCategoryBg)
+        } else {
+            holder.ivCategoryBg.setImageResource(item.imageResId)
+        }
         holder.tvCategoryTitle.text = item.title
 
         val overlay = holder.ivCategoryOverlay.drawable.mutate() as GradientDrawable
         overlay.setColor(Color.parseColor(item.overlayColor))
         holder.ivCategoryOverlay.setImageDrawable(overlay)
+
+        holder.itemView.setOnClickListener {
+            onCategoryClick(item)
+        }
     }
 
     override fun getItemCount(): Int = items.size

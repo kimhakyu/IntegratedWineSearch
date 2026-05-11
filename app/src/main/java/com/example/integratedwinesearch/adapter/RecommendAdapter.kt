@@ -6,12 +6,14 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
+import com.bumptech.glide.Glide
 import com.example.integratedwinesearch.R
 import com.example.integratedwinesearch.model.WineItem
 import java.text.DecimalFormat
 
 class RecommendAdapter(
-    private val items: List<WineItem>
+    private val items: List<WineItem>,
+    private val onWineClick: (WineItem) -> Unit
 ) : RecyclerView.Adapter<RecommendAdapter.RecommendViewHolder>() {
 
     private val decimalFormat = DecimalFormat("#,###")
@@ -34,12 +36,21 @@ class RecommendAdapter(
     override fun onBindViewHolder(holder: RecommendViewHolder, position: Int) {
         val item = items[position]
 
-        holder.ivRecommendWine.setImageResource(item.imageResId)
+        if (!item.imageUrl.isNullOrBlank()) {
+            Glide.with(holder.itemView.context)
+                .load(item.imageUrl)
+                .placeholder(R.drawable.sample_wine_red)
+                .error(R.drawable.sample_wine_red)
+                .into(holder.ivRecommendWine)
+        } else {
+            holder.ivRecommendWine.setImageResource(item.imageResId)
+        }
         holder.tvRecommendType.text = item.type
         holder.tvRecommendName.text = item.name
         holder.tvRecommendDescription.text = item.description ?: ""
         holder.tvRecommendGrade.text = item.grade
         holder.tvRecommendPrice.text = "₩${decimalFormat.format(item.price)}"
+        holder.itemView.setOnClickListener { onWineClick(item) }
     }
 
     override fun getItemCount(): Int = items.size

@@ -6,6 +6,7 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
+import com.bumptech.glide.Glide
 import com.example.integratedwinesearch.R
 import com.example.integratedwinesearch.home.model.BannerItem
 
@@ -27,7 +28,15 @@ class BannerAdapter(
 
     override fun onBindViewHolder(holder: BannerViewHolder, position: Int) {
         val item = items[position]
-        holder.ivBanner.setImageResource(item.imageResId)
+        if (!item.imageUrl.isNullOrBlank()) {
+            Glide.with(holder.itemView.context)
+                .load(item.imageUrl)
+                .placeholder(item.imageResId)
+                .error(item.imageResId)
+                .into(holder.ivBanner)
+        } else {
+            holder.ivBanner.setImageResource(item.imageResId)
+        }
         holder.tvBannerTitle.text = item.title
         holder.tvBannerSubTitle.text = item.subTitle
     }

@@ -2,4 +2,6 @@
 <resources>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
+    <color name="auth_red">#C91A1D</color>
+    <color name="auth_gray">#6F7685</color>
 </resources>

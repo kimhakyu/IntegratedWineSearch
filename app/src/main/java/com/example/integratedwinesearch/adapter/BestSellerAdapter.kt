@@ -1,20 +1,24 @@
 package com.example.integratedwinesearch.adapter
 
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
+import com.bumptech.glide.Glide
 import com.example.integratedwinesearch.R
 import com.example.integratedwinesearch.model.WineItem
 import java.text.DecimalFormat
 
 class BestSellerAdapter(
-    private val items: List<WineItem>
+    private val items: List<WineItem>,
+    private val onWineClick: (WineItem) -> Unit
 ) : RecyclerView.Adapter<BestSellerAdapter.BestSellerViewHolder>() {
 
     private val decimalFormat = DecimalFormat("#,###")
+    private val tag = "BestSellerAdapter"
 
     inner class BestSellerViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         val ivWineImage: ImageView = view.findViewById(R.id.ivWineImage)
@@ -33,11 +37,22 @@ class BestSellerAdapter(
     override fun onBindViewHolder(holder: BestSellerViewHolder, position: Int) {
         val item = items[position]
 
-        holder.ivWineImage.setImageResource(item.imageResId)
+        if (!item.imageUrl.isNullOrBlank()) {
+            Log.d(tag, "이미지 로드 시도 url=${item.imageUrl}")
+            Glide.with(holder.itemView.context)
+                .load(item.imageUrl)
+                .placeholder(R.drawable.sample_wine_red)
+                .error(R.drawable.sample_wine_red)
+                .into(holder.ivWineImage)
+        } else {
+            holder.ivWineImage.setImageResource(item.imageResId)
+        }
+
         holder.tvWineGrade.text = item.grade
         holder.tvWineType.text = item.type
         holder.tvWineName.text = item.name
         holder.tvWinePrice.text = "₩${decimalFormat.format(item.price)}"
+        holder.itemView.setOnClickListener { onWineClick(item) }
     }
 
     override fun getItemCount(): Int = items.size

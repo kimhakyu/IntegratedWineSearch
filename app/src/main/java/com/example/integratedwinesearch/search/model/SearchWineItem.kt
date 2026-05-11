@@ -9,5 +9,6 @@ data class SearchWineItem(
     val price: Int,
     val searchCount: Int,
     val grade: String,
-    val imageResId: Int
+    val imageResId: Int,
+    val imageUrl: String? = null
 )

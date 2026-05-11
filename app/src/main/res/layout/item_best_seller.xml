@@ -2,7 +2,7 @@
 <com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="160dp"
-    android:layout_height="280dp"
+    android:layout_height="300dp"
     android:layout_marginEnd="14dp"
     app:cardCornerRadius="18dp"
     app:cardElevation="0dp"
@@ -48,17 +48,20 @@
 
             <TextView
                 android:id="@+id/tvWineType"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:ellipsize="end"
+                android:maxLines="2"
                 android:text="레드"
                 android:textColor="#8B8B95"
                 android:textSize="12sp" />
 
             <TextView
                 android:id="@+id/tvWineName"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="6dp"
+                android:ellipsize="end"
                 android:maxLines="2"
                 android:text="바롤로 리제르바"
                 android:textColor="#222222"

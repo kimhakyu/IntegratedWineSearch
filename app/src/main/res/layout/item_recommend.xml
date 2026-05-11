@@ -34,17 +34,20 @@
 
             <TextView
                 android:id="@+id/tvRecommendType"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:ellipsize="end"
+                android:maxLines="1"
                 android:text="레드"
                 android:textColor="#8B8B95"
                 android:textSize="12sp" />
 
             <TextView
                 android:id="@+id/tvRecommendName"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="6dp"
+                android:ellipsize="end"
                 android:maxLines="2"
                 android:text="카베르네 소비뇽 나파"
                 android:textColor="#222222"
@@ -53,9 +56,10 @@
 
             <TextView
                 android:id="@+id/tvRecommendDescription"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
+                android:ellipsize="end"
                 android:maxLines="2"
                 android:text="당신의 취향 기반 추천"
                 android:textColor="#666666"

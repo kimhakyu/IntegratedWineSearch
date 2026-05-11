@@ -6,12 +6,14 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
+import com.bumptech.glide.Glide
 import com.example.integratedwinesearch.R
 import com.example.integratedwinesearch.model.WineItem
 import java.text.DecimalFormat
 
 class RecentWineAdapter(
-    private val items: List<WineItem>
+    private val items: List<WineItem>,
+    private val onWineClick: (WineItem) -> Unit
 ) : RecyclerView.Adapter<RecentWineAdapter.RecentWineViewHolder>() {
 
     private val decimalFormat = DecimalFormat("#,###")
@@ -34,12 +36,21 @@ class RecentWineAdapter(
     override fun onBindViewHolder(holder: RecentWineViewHolder, position: Int) {
         val item = items[position]
 
-        holder.ivRecentWine.setImageResource(item.imageResId)
+        if (!item.imageUrl.isNullOrBlank()) {
+            Glide.with(holder.itemView.context)
+                .load(item.imageUrl)
+                .placeholder(R.drawable.sample_wine_red)
+                .error(R.drawable.sample_wine_red)
+                .into(holder.ivRecentWine)
+        } else {
+            holder.ivRecentWine.setImageResource(item.imageResId)
+        }
         holder.tvRecentType.text = item.type
         holder.tvRecentName.text = item.name
         holder.tvRecentViewedTime.text = item.viewedTime ?: ""
         holder.tvRecentGrade.text = item.grade
         holder.tvRecentPrice.text = "₩${decimalFormat.format(item.price)}"
+        holder.itemView.setOnClickListener { onWineClick(item) }
     }
 
     override fun getItemCount(): Int = items.size

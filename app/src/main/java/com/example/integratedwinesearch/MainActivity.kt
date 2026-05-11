@@ -18,6 +18,7 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var bottomNav: BottomNavigationView
     private var lastImeVisible = false
+    private var pendingSearchCategory: String? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -91,7 +92,9 @@ class MainActivity : AppCompatActivity() {
                 }
 
                 R.id.nav_search -> {
-                    replaceFragment(SearchFragment())
+                    val fragment = SearchFragment.newInstance(pendingSearchCategory)
+                    pendingSearchCategory = null
+                    replaceFragment(fragment)
                     true
                 }
 
@@ -119,5 +122,10 @@ class MainActivity : AppCompatActivity() {
         supportFragmentManager.beginTransaction()
             .replace(R.id.fragmentContainer, fragment)
             .commit()
+    }
+
+    fun openSearchWithCategory(categoryName: String) {
+        pendingSearchCategory = categoryName
+        bottomNav.selectedItemId = R.id.nav_search
     }
 }

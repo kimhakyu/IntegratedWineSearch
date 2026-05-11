@@ -7,6 +7,7 @@ data class WineItem(
     val name: String,
     val price: Int,
     val imageResId: Int,
+    val imageUrl: String? = null,
 
     // 선택적 데이터 (필요할 때만 사용)
     val description: String? = null,   // 추천용

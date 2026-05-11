@@ -4,5 +4,6 @@ data class SearchCategoryItem(
     val id: String,
     val title: String,
     val imageResId: Int,
-    val overlayColor: String
+    val overlayColor: String,
+    val imageUrl: String? = null
 )
