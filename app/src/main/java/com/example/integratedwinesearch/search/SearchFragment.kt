@@ -9,20 +9,27 @@ import androidx.core.widget.NestedScrollView
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.example.integratedwinesearch.AuthSession
 import com.example.integratedwinesearch.R
 import com.example.integratedwinesearch.WineDetailActivity
 import com.example.integratedwinesearch.search.model.SearchCategoryItem
 import com.example.integratedwinesearch.search.model.SearchWineItem
+import com.example.integratedwinesearch.wine.WineRepository
 
 class SearchFragment : Fragment(R.layout.fragment_search) {
 
     companion object {
         private const val ARG_PRESELECT_CATEGORY = "arg_preselect_category"
+        private const val ARG_PREFILL_QUERY = "arg_prefill_query"
 
-        fun newInstance(preselectCategory: String? = null): SearchFragment {
+        fun newInstance(
+            preselectCategory: String? = null,
+            prefillQuery: String? = null
+        ): SearchFragment {
             return SearchFragment().apply {
                 arguments = Bundle().apply {
                     putString(ARG_PRESELECT_CATEGORY, preselectCategory)
+                    putString(ARG_PREFILL_QUERY, prefillQuery)
                 }
             }
         }
@@ -35,6 +42,7 @@ class SearchFragment : Fragment(R.layout.fragment_search) {
     private lateinit var tvPopularTitle: TextView
 
     private val searchRepository = SearchRepository()
+    private val wineRepository = WineRepository()
     private val wineItems = mutableListOf<SearchWineItem>()
     private lateinit var wineAdapter: SearchWineAdapter
 
@@ -45,14 +53,17 @@ class SearchFragment : Fragment(R.layout.fragment_search) {
     private var isLoading = false
     private var hasMore = true
     private var preselectCategoryName: String? = null
+    private var prefillQuery: String? = null
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         preselectCategoryName = arguments?.getString(ARG_PRESELECT_CATEGORY)
+        prefillQuery = arguments?.getString(ARG_PREFILL_QUERY)
 
         initViews(view)
         initCategory()
         initSearchView()
+        applyPrefillQuery()
         fetchPopularWine(isNextPage = false)
     }
 
@@ -66,6 +77,13 @@ class SearchFragment : Fragment(R.layout.fragment_search) {
         popularWineRecyclerView.layoutManager =
             LinearLayoutManager(requireContext(), LinearLayoutManager.VERTICAL, false)
         wineAdapter = SearchWineAdapter(wineItems) { wine ->
+            val userId = AuthSession.email.ifBlank { "guest" }
+            wineRepository.saveUserViewLog(
+                userId = userId,
+                wineName = wine.name,
+                category = wine.type
+            )
+
             val intent = WineDetailActivity.createIntent(
                 context = requireContext(),
                 mode = WineDetailActivity.MODE_SEARCH,
@@ -125,6 +143,14 @@ class SearchFragment : Fragment(R.layout.fragment_search) {
                 return true
             }
         })
+    }
+
+    private fun applyPrefillQuery() {
+        val query = prefillQuery?.trim().orEmpty()
+        if (query.isBlank()) return
+        searchQuery = query
+        searchView.setQuery(query, false)
+        prefillQuery = null
     }
 
     private fun fetchPopularWine(isNextPage: Boolean) {

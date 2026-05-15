@@ -20,6 +20,7 @@ import com.example.integratedwinesearch.RecentWineRepository
 import com.example.integratedwinesearch.adapter.RecommendAdapter
 import com.example.integratedwinesearch.RecommendRepository
 import com.example.integratedwinesearch.WineDetailActivity
+import com.example.integratedwinesearch.AuthSession
 import com.example.integratedwinesearch.model.WineItem
 import com.example.integratedwinesearch.wine.WineRepository
 
@@ -98,11 +99,7 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
         bestSellerRecyclerView.layoutManager =
             LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false)
 
-        wineRepository.getWines(
-            search = null,
-            page = 1,
-            limit = 10
-        ) { success, wines, error ->
+        wineRepository.getWinesRanking { success, wines, error ->
 
             requireActivity().runOnUiThread {
                 if (success) {
@@ -121,14 +118,13 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
         recommendRecyclerView.layoutManager =
             LinearLayoutManager(requireContext(), LinearLayoutManager.VERTICAL, false)
 
-        wineRepository.getWines(
-            search = null,
-            page = 1,
-            limit = 4
-        ) { success, wines, error ->
+        val userId = AuthSession.email.ifBlank { "guest" }
+        Log.d("HomeFragment", "Recommend 요청 userId=$userId")
+
+        wineRepository.getRecommendWines(userId = userId) { success, wines, error ->
             requireActivity().runOnUiThread {
-                if (success) {
-                    val recommendItems = wines.map {
+                if (success && wines.isNotEmpty()) {
+                    val recommendItems = wines.take(4).map {
                         mapServerWineToWineItem(
                             wine = it,
                             description = "당신의 취향 기반 추천"
@@ -138,11 +134,27 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
                         openWineDetail(wine)
                     }
                 } else {
-                    Log.e("HomeFragment", "Recommend 조회 실패: $error")
-                    recommendRecyclerView.adapter =
-                        RecommendAdapter(recommendRepository.getRecommendItems()) { wine ->
-                            openWineDetail(wine)
+                    Log.e("HomeFragment", "Recommend 비어있거나 실패: success=$success, error=$error")
+                    wineRepository.getWines(search = null, page = 1, limit = 4) { s2, w2, _ ->
+                        requireActivity().runOnUiThread {
+                            if (s2 && w2.isNotEmpty()) {
+                                val fallbackItems = w2.map {
+                                    mapServerWineToWineItem(
+                                        wine = it,
+                                        description = "당신의 취향 기반 추천"
+                                    )
+                                }
+                                recommendRecyclerView.adapter = RecommendAdapter(fallbackItems) { wine ->
+                                    openWineDetail(wine)
+                                }
+                            } else {
+                                recommendRecyclerView.adapter =
+                                    RecommendAdapter(recommendRepository.getRecommendItems()) { wine ->
+                                        openWineDetail(wine)
+                                    }
+                            }
                         }
+                    }
                 }
             }
         }
@@ -181,6 +193,13 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
     }
 
     private fun openWineDetail(wine: WineItem) {
+        val userId = AuthSession.email.ifBlank { "guest" }
+        wineRepository.saveUserViewLog(
+            userId = userId,
+            wineName = wine.name,
+            category = wine.type
+        )
+
         val intent = WineDetailActivity.createIntent(
             context = requireContext(),
             mode = WineDetailActivity.MODE_SEARCH,

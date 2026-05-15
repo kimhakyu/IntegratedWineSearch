@@ -58,8 +58,31 @@ class SearchRepository {
         limit: Int = 10,
         callback: (Boolean, List<SearchWineItem>, String?) -> Unit
     ) {
+        val candidates = buildSearchCandidates(keyword)
+        requestByCandidates(
+            candidates = candidates,
+            page = page,
+            limit = limit,
+            callback = callback
+        )
+    }
+
+    private fun requestByCandidates(
+        candidates: List<String?>,
+        page: Int,
+        limit: Int,
+        callback: (Boolean, List<SearchWineItem>, String?) -> Unit
+    ) {
+        if (candidates.isEmpty()) {
+            callback(true, emptyList(), null)
+            return
+        }
+
+        val current = candidates.first()
+        val remain = candidates.drop(1)
+
         wineRepository.getWines(
-            search = keyword,
+            search = current,
             page = page,
             limit = limit
         ) { success, wines, error ->
@@ -68,23 +91,51 @@ class SearchRepository {
                 return@getWines
             }
 
-            val mapped = wines.mapIndexed { index, wine ->
-                SearchWineItem(
-                    id = wine.id.toString(),
-                    rank = index + 1,
-                    name = wine.name,
-                    type = wine.category,
-                    region = wine.area,
-                    price = wine.price,
-                    searchCount = 0,
-                    grade = "A",
-                    imageResId = R.drawable.sample_wine_red,
-                    imageUrl = normalizeImageUrl(wine.imageUrl)
-                )
+            if (wines.isNotEmpty() || remain.isEmpty()) {
+                val mapped = wines.mapIndexed { index, wine ->
+                    SearchWineItem(
+                        id = wine.id.toString(),
+                        rank = index + 1,
+                        name = wine.name,
+                        type = wine.category,
+                        region = wine.area,
+                        price = wine.price,
+                        searchCount = 0,
+                        grade = "A",
+                        imageResId = R.drawable.sample_wine_red,
+                        imageUrl = normalizeImageUrl(wine.imageUrl)
+                    )
+                }
+                callback(true, mapped, null)
+            } else {
+                requestByCandidates(remain, page, limit, callback)
             }
-
-            callback(true, mapped, null)
         }
+    }
+
+    private fun buildSearchCandidates(keyword: String?): List<String?> {
+        val q = keyword?.trim().orEmpty()
+        if (q.isBlank()) return listOf(null)
+
+        val cleaned = q
+            .replace("…", " ")
+            .replace("...", " ")
+            .replace(Regex("[^\\p{L}\\p{N}\\s-]"), " ")
+            .replace(Regex("\\s+"), " ")
+            .trim()
+
+        val tokens = cleaned.split(" ").filter { it.isNotBlank() }
+        val firstTwo = tokens.take(2).joinToString(" ").trim()
+        val firstOne = tokens.firstOrNull().orEmpty()
+        val withoutYear = cleaned.replace(Regex("\\b(19|20)\\d{2}\\b"), "").trim()
+
+        return listOf(
+            cleaned.ifBlank { null },
+            withoutYear.ifBlank { null },
+            firstTwo.ifBlank { null },
+            firstOne.ifBlank { null },
+            null
+        ).distinct()
     }
 
     private fun normalizeImageUrl(imageUrl: String?): String? {
