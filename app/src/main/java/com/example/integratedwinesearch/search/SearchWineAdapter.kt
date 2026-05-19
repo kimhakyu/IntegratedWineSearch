@@ -54,7 +54,7 @@ class SearchWineAdapter(
         holder.tvWineName.text = item.name
         holder.tvWineGrade.text = item.grade
         holder.tvWineType.text = item.type
-        holder.tvWineRegion.text = item.region
+        holder.tvWineRegion.text = item.description?.takeIf { it.isNotBlank() } ?: item.region
         holder.tvWinePrice.text = "₩${decimalFormat.format(item.price)}"
         holder.tvSearchCount.text = "${decimalFormat.format(item.searchCount)} 검색"
         holder.itemView.setOnClickListener { onWineClick(item) }

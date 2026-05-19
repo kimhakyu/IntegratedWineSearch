@@ -136,6 +136,7 @@
                     android:background="#E9EBEF" />
 
                 <TextView
+                    android:id="@+id/tvWineDescription"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="16dp"
@@ -163,6 +164,7 @@
                     android:textStyle="bold" />
 
                 <LinearLayout
+                    android:id="@+id/layoutNfcPromptBody"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="12dp"
@@ -200,6 +202,31 @@
                         android:textStyle="bold"
                         app:backgroundTint="#C91A1D"
                         app:cornerRadius="12dp" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/layoutScannedGraph"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="12dp"
+                    android:background="#F3F8F4"
+                    android:orientation="vertical"
+                    android:padding="14dp"
+                    android:visibility="gone">
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="실시간 온도 변화"
+                        android:textColor="#1F2430"
+                        android:textSize="14sp"
+                        android:textStyle="bold" />
+
+                    <com.example.integratedwinesearch.view.StorageLineChartView
+                        android:id="@+id/storageLineChartView"
+                        android:layout_width="match_parent"
+                        android:layout_height="180dp"
+                        android:layout_marginTop="10dp" />
                 </LinearLayout>
             </LinearLayout>
 

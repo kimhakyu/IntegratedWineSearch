@@ -8,6 +8,7 @@ import android.widget.ImageButton
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.example.integratedwinesearch.NfcScanActivity
 import com.example.integratedwinesearch.R
 import com.example.integratedwinesearch.chat.model.ChatMessage
 import java.util.Date
@@ -29,6 +30,9 @@ class ChatFragment : Fragment(R.layout.fragment_chat) {
         chatRecyclerView = view.findViewById(R.id.chatRecyclerView)
         etMessage = view.findViewById(R.id.etMessage)
         btnSend = view.findViewById(R.id.btnSend)
+        view.findViewById<ImageButton>(R.id.btnChatInfo).setOnClickListener {
+            startActivity(NfcScanActivity.createIntent(requireContext()))
+        }
 
         initChatList()
         initSendButton()

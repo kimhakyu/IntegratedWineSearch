@@ -11,6 +11,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.viewpager2.widget.ViewPager2
 import com.example.integratedwinesearch.MainActivity
+import com.example.integratedwinesearch.NfcScanActivity
 import com.example.integratedwinesearch.R
 import com.example.integratedwinesearch.adapter.CategoryAdapter
 import com.example.integratedwinesearch.CategoryRepository
@@ -37,6 +38,7 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
     private val recommendRepository = RecommendRepository()
     private val recentWineRepository = RecentWineRepository()
     private val wineRepository = WineRepository()
+    private var refreshOnResume: Boolean = false
 
     private val sliderHandler = Handler(Looper.getMainLooper())
 
@@ -70,6 +72,9 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
         bestSellerRecyclerView = view.findViewById(R.id.bestSellerRecyclerView)
         recommendRecyclerView = view.findViewById(R.id.recommendRecyclerView)
         recentRecyclerView = view.findViewById(R.id.recentRecyclerView)
+        view.findViewById<View>(R.id.btnNotice).setOnClickListener {
+            startActivity(NfcScanActivity.createIntent(requireContext()))
+        }
     }
 
     private fun initBanner() {
@@ -199,16 +204,18 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
             wineName = wine.name,
             category = wine.type
         )
+        refreshOnResume = true
 
         val intent = WineDetailActivity.createIntent(
             context = requireContext(),
             mode = WineDetailActivity.MODE_SEARCH,
             wineName = wine.name,
             wineType = wine.type,
-            wineRegion = "프랑스 보르도",
+            wineRegion = wine.region,
             wineGrade = wine.grade,
             winePrice = wine.price,
-            wineImageUrl = wine.imageUrl
+            wineImageUrl = wine.imageUrl,
+            wineDescription = wine.description
         )
         startActivity(intent)
     }
@@ -223,12 +230,13 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
         return WineItem(
             id = wine.id.toString(),
             type = wine.category,
+            region = wine.area,
             grade = "A",
-            name = wine.name,
+            name = wine.displayName,
             price = wine.price,
             imageResId = R.drawable.sample_wine_red,
             imageUrl = fullImageUrl,
-            description = description,
+            description = wine.description ?: description,
             viewedTime = viewedTime
         )
     }
@@ -245,6 +253,12 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
     override fun onResume() {
         super.onResume()
         sliderHandler.postDelayed(sliderRunnable, 3000)
+        if (refreshOnResume) {
+            refreshOnResume = false
+            initBestSeller()
+            initRecommend()
+            initRecentWine()
+        }
     }
 
     override fun onPause() {

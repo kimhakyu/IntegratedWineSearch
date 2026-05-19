@@ -6,6 +6,7 @@ data class SearchWineItem(
     val name: String,
     val type: String,
     val region: String,
+    val description: String? = null,
     val price: Int,
     val searchCount: Int,
     val grade: String,

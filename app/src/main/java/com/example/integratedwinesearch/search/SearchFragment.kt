@@ -3,6 +3,7 @@ package com.example.integratedwinesearch.search
 import android.os.Bundle
 import android.util.Log
 import android.view.View
+import android.widget.ImageButton
 import android.widget.TextView
 import androidx.appcompat.widget.SearchView
 import androidx.core.widget.NestedScrollView
@@ -10,6 +11,7 @@ import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.integratedwinesearch.AuthSession
+import com.example.integratedwinesearch.NfcScanActivity
 import com.example.integratedwinesearch.R
 import com.example.integratedwinesearch.WineDetailActivity
 import com.example.integratedwinesearch.search.model.SearchCategoryItem
@@ -54,6 +56,7 @@ class SearchFragment : Fragment(R.layout.fragment_search) {
     private var hasMore = true
     private var preselectCategoryName: String? = null
     private var prefillQuery: String? = null
+    private var refreshOnResume: Boolean = false
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -67,12 +70,23 @@ class SearchFragment : Fragment(R.layout.fragment_search) {
         fetchPopularWine(isNextPage = false)
     }
 
+    override fun onResume() {
+        super.onResume()
+        if (refreshOnResume) {
+            refreshOnResume = false
+            fetchPopularWine(isNextPage = false)
+        }
+    }
+
     private fun initViews(view: View) {
         searchScrollView = view.findViewById(R.id.searchScrollView)
         categoryRecyclerView = view.findViewById(R.id.categoryRecyclerView)
         popularWineRecyclerView = view.findViewById(R.id.popularWineRecyclerView)
         searchView = view.findViewById(R.id.searchView)
         tvPopularTitle = view.findViewById(R.id.tvPopularTitle)
+        view.findViewById<ImageButton>(R.id.btnSearchAction).setOnClickListener {
+            startActivity(NfcScanActivity.createIntent(requireContext()))
+        }
 
         popularWineRecyclerView.layoutManager =
             LinearLayoutManager(requireContext(), LinearLayoutManager.VERTICAL, false)
@@ -83,6 +97,7 @@ class SearchFragment : Fragment(R.layout.fragment_search) {
                 wineName = wine.name,
                 category = wine.type
             )
+            refreshOnResume = true
 
             val intent = WineDetailActivity.createIntent(
                 context = requireContext(),
@@ -92,7 +107,8 @@ class SearchFragment : Fragment(R.layout.fragment_search) {
                 wineRegion = wine.region,
                 wineGrade = wine.grade,
                 winePrice = wine.price,
-                wineImageUrl = wine.imageUrl
+                wineImageUrl = wine.imageUrl,
+                wineDescription = wine.description
             )
             startActivity(intent)
         }
@@ -100,12 +116,13 @@ class SearchFragment : Fragment(R.layout.fragment_search) {
 
         searchScrollView.setOnScrollChangeListener(
             NestedScrollView.OnScrollChangeListener { _, _, scrollY, _, _ ->
-            val child = searchScrollView.getChildAt(0) ?: return@OnScrollChangeListener
-            val reachedBottom = scrollY >= (child.measuredHeight - searchScrollView.measuredHeight - 120)
-            if (reachedBottom && shouldEnablePagination()) {
-                fetchPopularWine(isNextPage = true)
+                val child = searchScrollView.getChildAt(0) ?: return@OnScrollChangeListener
+                val reachedBottom = scrollY >= (child.measuredHeight - searchScrollView.measuredHeight - 120)
+                if (reachedBottom && shouldEnablePagination()) {
+                    fetchPopularWine(isNextPage = true)
+                }
             }
-        })
+        )
     }
 
     private fun initCategory() {
@@ -120,7 +137,8 @@ class SearchFragment : Fragment(R.layout.fragment_search) {
 
         preselectCategoryName?.let { name ->
             selectedCategory = categoryItems.firstOrNull {
-                it.title.contains(name, ignoreCase = true) || name.contains(it.title.replace(" 와인", ""), ignoreCase = true)
+                it.title.contains(name, ignoreCase = true) ||
+                    name.contains(it.title.replace(" 와인", ""), ignoreCase = true)
             }
             preselectCategoryName = null
         }
@@ -164,9 +182,9 @@ class SearchFragment : Fragment(R.layout.fragment_search) {
         val requestPage = if (isNextPage) currentPage + 1 else 1
         isLoading = true
 
-        val keyword = buildKeyword()
         searchRepository.getPopularWineItemsFromServer(
-            keyword = keyword,
+            keyword = buildSearchKeyword(),
+            category = mapCategoryToApiCategory(selectedCategory),
             page = requestPage,
             limit = pageSize
         ) { success, fetchedItems, error ->
@@ -215,25 +233,18 @@ class SearchFragment : Fragment(R.layout.fragment_search) {
         }
     }
 
-    private fun buildKeyword(): String? {
-        val categoryKeyword = mapCategoryToApiKeyword(selectedCategory)
-        val queryKeyword = searchQuery.trim()
-
-        val merged = listOf(queryKeyword, categoryKeyword)
-            .filter { it.isNotBlank() }
-            .joinToString(" ")
-
-        return merged.ifBlank { null }
+    private fun buildSearchKeyword(): String? {
+        return searchQuery.trim().ifBlank { null }
     }
 
-    private fun mapCategoryToApiKeyword(category: SearchCategoryItem?): String {
+    private fun mapCategoryToApiCategory(category: SearchCategoryItem?): String? {
         val raw = category?.title.orEmpty()
         return when {
-            raw.contains("레드") -> "red"
-            raw.contains("화이트") -> "white"
-            raw.contains("로제") -> "rose"
-            raw.contains("스파클링") -> "sparkling"
-            else -> raw.replace(" 와인", "").trim()
+            raw.contains("레드") -> "Red Wine"
+            raw.contains("화이트") -> "White Wine"
+            raw.contains("로제") -> "Rosé Wine"
+            raw.contains("스파클링") -> "Sparkling Wine & Champagne"
+            else -> null
         }
     }
 }

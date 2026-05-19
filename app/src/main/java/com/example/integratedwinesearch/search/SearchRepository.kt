@@ -44,23 +44,25 @@ class SearchRepository {
 
     fun getPopularWineItems(): List<SearchWineItem> {
         return listOf(
-            SearchWineItem("1", 1, "바롤로 리제르바", "레드 와인", "이탈리아 피에몬테", 180000, 1250, "A", R.drawable.sample_wine_red),
-            SearchWineItem("2", 2, "리슬링 슈페트레제", "화이트 와인", "독일 모젤", 75000, 980, "B+", R.drawable.sample_wine_red),
-            SearchWineItem("3", 3, "무예 샹동 루제", "스파클링", "프랑스 샴페인", 95000, 875, "A-", R.drawable.sample_wine_red),
-            SearchWineItem("4", 4, "피노 누아 말보루", "레드 와인", "뉴질랜드 말보로", 68000, 720, "B+", R.drawable.sample_wine_red),
-            SearchWineItem("5", 5, "소비뇽 블랑", "화이트 와인", "뉴질랜드 말보로", 55000, 650, "B+", R.drawable.sample_wine_red)
+            SearchWineItem("1", 1, "바롤로 리제르바", "레드 와인", "이탈리아 피에몬테", null, 180000, 1250, "A", R.drawable.sample_wine_red),
+            SearchWineItem("2", 2, "리슬링 슈페트레제", "화이트 와인", "독일 모젤", null, 75000, 980, "B+", R.drawable.sample_wine_red),
+            SearchWineItem("3", 3, "무예 샹동 루제", "스파클링", "프랑스 샴페인", null, 95000, 875, "A-", R.drawable.sample_wine_red),
+            SearchWineItem("4", 4, "피노 누아 말보루", "레드 와인", "뉴질랜드 말보로", null, 68000, 720, "B+", R.drawable.sample_wine_red),
+            SearchWineItem("5", 5, "소비뇽 블랑", "화이트 와인", "뉴질랜드 말보로", null, 55000, 650, "B+", R.drawable.sample_wine_red)
         )
     }
 
     fun getPopularWineItemsFromServer(
         keyword: String? = null,
+        category: String? = null,
         page: Int = 1,
         limit: Int = 10,
         callback: (Boolean, List<SearchWineItem>, String?) -> Unit
     ) {
-        val candidates = buildSearchCandidates(keyword)
+        val candidates = if (keyword.isNullOrBlank()) listOf<String?>(null) else buildSearchCandidates(keyword)
         requestByCandidates(
             candidates = candidates,
+            category = category,
             page = page,
             limit = limit,
             callback = callback
@@ -69,6 +71,7 @@ class SearchRepository {
 
     private fun requestByCandidates(
         candidates: List<String?>,
+        category: String?,
         page: Int,
         limit: Int,
         callback: (Boolean, List<SearchWineItem>, String?) -> Unit
@@ -83,6 +86,7 @@ class SearchRepository {
 
         wineRepository.getWines(
             search = current,
+            category = category,
             page = page,
             limit = limit
         ) { success, wines, error ->
@@ -96,11 +100,12 @@ class SearchRepository {
                     SearchWineItem(
                         id = wine.id.toString(),
                         rank = index + 1,
-                        name = wine.name,
+                        name = wine.displayName,
                         type = wine.category,
                         region = wine.area,
+                        description = wine.description,
                         price = wine.price,
-                        searchCount = 0,
+                        searchCount = wine.viewCount,
                         grade = "A",
                         imageResId = R.drawable.sample_wine_red,
                         imageUrl = normalizeImageUrl(wine.imageUrl)
@@ -108,7 +113,7 @@ class SearchRepository {
                 }
                 callback(true, mapped, null)
             } else {
-                requestByCandidates(remain, page, limit, callback)
+                requestByCandidates(remain, category, page, limit, callback)
             }
         }
     }

@@ -3,6 +3,7 @@ package com.example.integratedwinesearch.model
 data class WineItem(
     val id: String,
     val type: String,
+    val region: String = "",
     val grade: String,
     val name: String,
     val price: Int,

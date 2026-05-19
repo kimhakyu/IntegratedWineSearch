@@ -20,6 +20,7 @@ class WineRepository {
 
     fun getWines(
         search: String? = null,
+        category: String? = null,
         page: Int = 1,
         limit: Int = 10,
         callback: (Boolean, List<ServerWineItem>, String?) -> Unit
@@ -30,6 +31,9 @@ class WineRepository {
 
         if (!search.isNullOrBlank()) {
             urlBuilder.appendQueryParameter("search", search)
+        }
+        if (!category.isNullOrBlank()) {
+            urlBuilder.appendQueryParameter("category", category)
         }
 
         val request = Request.Builder()
@@ -207,18 +211,32 @@ class WineRepository {
     private fun mapWine(item: JSONObject): ServerWineItem {
         val id = item.optInt("WINE_ID", item.optInt("wine_id", 0))
         val name = item.optString("WINE_NM", item.optString("wine_nm", ""))
+        val nameKr = item.optString("WINE_NM_KR", item.optString("wine_nm_kr", ""))
         val area = item.optString("WINE_AREA_NM", item.optString("wine_area_nm", ""))
         val category = item.optString("WINE_CTGRY", item.optString("wine_ctgry", ""))
         val price = item.optInt("WINE_PRC", item.optInt("wine_prc", 0))
         val imageUrl = item.optString("image_url", "")
+        val description = item.optString("description", item.optString("DESCRIPTION", ""))
+        val viewCount = when {
+            item.has("search_count") -> item.optInt("search_count", 0)
+            item.has("SEARCH_COUNT") -> item.optInt("SEARCH_COUNT", 0)
+            item.has("view_count") -> item.optInt("view_count", 0)
+            item.has("VIEW_COUNT") -> item.optInt("VIEW_COUNT", 0)
+            item.has("WINE_VIEW_CNT") -> item.optInt("WINE_VIEW_CNT", 0)
+            item.has("wine_view_cnt") -> item.optInt("wine_view_cnt", 0)
+            else -> 0
+        }
 
         return ServerWineItem(
             id = id,
             name = name,
+            nameKr = nameKr.ifBlank { null },
             area = area,
             category = category,
             price = price,
-            imageUrl = imageUrl
+            imageUrl = imageUrl,
+            description = description.ifBlank { null },
+            viewCount = viewCount
         )
     }
 }
